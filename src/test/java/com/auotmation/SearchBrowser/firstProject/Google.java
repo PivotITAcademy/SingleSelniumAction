@@ -1,9 +1,12 @@
 package com.auotmation.SearchBrowser.firstProject;
 
+import java.util.Set;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -24,29 +27,27 @@ public class Google {
 
 		driver = new ChromeDriver();
 
-		driver.get("https://demoqa.com/buttons");
-
+		driver.get("https://demoqa.com/droppable");
 		driver.manage().window().maximize();
 
 	}
 
 	@Test(priority = 1)
-	@Ignore
 	public void demoQaTitle() {
 
 		String titleOfPage = driver.getTitle();
 		System.out.println("Title of the Page: " + titleOfPage);
 		Assert.assertEquals(titleOfPage, "ToolsQA");
 	}
-	
+
 	public int sum(int a, int b) {
 		return 10;
-		
+
 	}
 
 	@Test(priority = 2, invocationCount = 3)
 	@Ignore
-	public void clickElementsOnHomePage() {		
+	public void clickElementsOnHomePage() {
 		WebElement element = driver.findElement(By.cssSelector("div[class='avatar mx-auto white']"));
 		element.click();
 		try {
@@ -194,52 +195,205 @@ public class Google {
 		Assert.assertEquals(getTextForSelectedRadioButton.getText(), "Impressive");
 
 	}
+
 	@Test
 	@Ignore
 	public void getTableText() {
-		
-		//selenium easy website
-		
-		
-		WebElement table6thElement=driver.findElement(By.cssSelector("table[class='table table-hover'] tr:nth-child(6) td:last-of-type"));
-		
+
+		// selenium easy website
+
+		WebElement table6thElement = driver
+				.findElement(By.cssSelector("table[class='table table-hover'] tr:nth-child(6) td:last-of-type"));
+
 		System.out.println("Text at 6th is : " + table6thElement.getText());
-		
+
 	}
-	
+
 	@Test
 	@Ignore
 	public void doubleClick() {
-		WebElement doubleClickButton=driver.findElement(By.id("doubleClickBtn"));
-		
-		Actions action=new Actions(driver);
-		
+		WebElement doubleClickButton = driver.findElement(By.id("doubleClickBtn"));
+
+		Actions action = new Actions(driver);
+
 		action.doubleClick(doubleClickButton).perform();
-		
-		WebElement doubleClickSucessMessage=driver.findElement(By.id("doubleClickMessage"));
-		
+
+		WebElement doubleClickSucessMessage = driver.findElement(By.id("doubleClickMessage"));
+
 		Assert.assertEquals(doubleClickSucessMessage.getText(), "You have done a double click");
-		
+
 	}
-	
+
 	@Test
 	public void rightClick() {
-		WebElement rightClickButton=driver.findElement(By.id("rightClickBtn"));
-		
-		Actions action=new Actions(driver);
-		
+		WebElement rightClickButton = driver.findElement(By.id("rightClickBtn"));
+
+		Actions action = new Actions(driver);
+
 		action.contextClick(rightClickButton).perform();
-		
-		WebElement rightClickSucessMessage=driver.findElement(By.id("rightClickMessage"));
-		
+
+		WebElement rightClickSucessMessage = driver.findElement(By.id("rightClickMessage"));
+
 		Assert.assertEquals(rightClickSucessMessage.getText(), "You have done a right click");
-		
+
 	}
 
+	@Test
+	public void clickLink() {
+		WebElement link = driver.findElement(By.cssSelector("div.element-list.collapse.show ul li#item-5"));
 
+		link.click();
+
+		try {
+			Thread.sleep(50000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void uploadPicture() {
+		WebElement chooseFile = driver.findElement(By.id("uploadPicture"));
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		chooseFile.sendKeys("put path of the file here");
+		try {
+			Thread.sleep(50000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	// Test to switch between different tabs
+	@Test
+	public void newTab() {
+
+		// Get current handle of the driver
+		String Currenthandle = driver.getWindowHandle();
+
+		WebElement tab = driver.findElement(By.id("tabButton"));
+		System.out.println("Tab element is : " + tab);
+		tab.click();
+
+		// Get the handle of new tab
+		String newHandle = handle(Currenthandle);
+
+		System.out.println("Window handle before switch : " + Currenthandle);
+
+		// Transfer driver handle to new tab
+		driver.switchTo().window(newHandle);
+		System.out.println("Current window handle is : " + newHandle);
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		WebElement newWindow = driver.findElement(By.id("sampleHeading"));
+		// Printout the text on new Tab
+		System.out.println(newWindow.getText());
+
+		// Driver switch handle to old tab
+		driver.switchTo().window(Currenthandle);
+
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		// click on new tab button on current window handle
+		tab.click();
+
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	// Method of get the handle of new tab or window
+	public String handle(String Currenthandle) {
+
+		Set<String> allWindowHandles = driver.getWindowHandles();
+
+		for (String handle : allWindowHandles) {
+			if (!handle.equals(Currenthandle)) {
+				return handle;
+			}
+		}
+		return null;
+	}
+
+	// Test to accept alerts
+	@Test
+	public void alertAccept() {
+		WebElement alertButton = driver.findElement(By.id("confirmButton"));
+		alertButton.click();
+
+		Alert alert = driver.switchTo().alert();
+
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//alerts can either be accepted or dismissed, there are only 2 methods for that alert.accept() or alert.dismiss()
+		alert.dismiss();
+
+		System.out.println(driver.findElement(By.id("confirmResult")).getText());
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	// Test to perform Drag and drop using Actions Class
+	@Test
+	public void dragDrop() {
+		WebElement item = driver.findElement(By.id("draggable"));
+		WebElement target = driver.findElement(By.id("droppable"));
+
+		Actions builder = new Actions(driver);
+
+		Action dragandDrop = builder.clickAndHold(item).moveToElement(target).release(item).build();
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		dragandDrop.perform();
+
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	//Method to close the session of driver
 	@AfterMethod
 	public void afterMethod() {
-		driver.close();
+		driver.quit();
 
 	}
 
