@@ -1,13 +1,27 @@
 package com.auotmation.SearchBrowser.firstProject;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -27,7 +41,9 @@ public class Google {
 
 		driver = new ChromeDriver();
 
-		driver.get("https://demoqa.com/droppable");
+		driver.get("https://www.walmart.ca/en");
+		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		driver.manage().window().maximize();
 
 	}
@@ -290,12 +306,7 @@ public class Google {
 		// Transfer driver handle to new tab
 		driver.switchTo().window(newHandle);
 		System.out.println("Current window handle is : " + newHandle);
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+
 
 		WebElement newWindow = driver.findElement(By.id("sampleHeading"));
 		// Printout the text on new Tab
@@ -304,22 +315,11 @@ public class Google {
 		// Driver switch handle to old tab
 		driver.switchTo().window(Currenthandle);
 
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+
 
 		// click on new tab button on current window handle
 		tab.click();
 
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 	}
 
@@ -339,27 +339,35 @@ public class Google {
 	// Test to accept alerts
 	@Test
 	public void alertAccept() {
-		WebElement alertButton = driver.findElement(By.id("confirmButton"));
-		alertButton.click();
+		WebElement timerAlertButton = driver.findElement(By.id("timerAlertButton"));
+		timerAlertButton.click();
+		
+		List<String> name=new ArrayList<>();
+		WebDriverWait webDriverWait = new WebDriverWait(driver, 3);
+		
+		webDriverWait.until(ExpectedConditions.alertIsPresent());
 
+		// alerts can either be accepted or dismissed, there are only 2 methods for that
+		// alert.accept() or alert.dismiss()
 		Alert alert = driver.switchTo().alert();
-
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//alerts can either be accepted or dismissed, there are only 2 methods for that alert.accept() or alert.dismiss()
 		alert.dismiss();
+		
+		WebElement confirmText=driver.findElement(By.id("confirmResult"));
+		
+		Wait<WebDriver> fw = new FluentWait<WebDriver>(driver).withTimeout(60, TimeUnit.SECONDS)
+				.pollingEvery(5, TimeUnit.SECONDS).ignoring(NoAlertPresentException.class);
 
-		System.out.println(driver.findElement(By.id("confirmResult")).getText());
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		fw.until(ExpectedConditions.visibilityOf(confirmText));
+		
+		
+		Wait<WebDriver> fluentWait=new FluentWait<WebDriver>(driver).
+				withTimeout(10,TimeUnit.SECONDS).pollingEvery(5,TimeUnit.SECONDS).ignoring(NoSuchElementException.class);
+		
+		fluentWait.until(ExpectedConditions.visibilityOf(confirmText));
+		
+		System.out.println(confirmText.getText());
+
+	
 
 	}
 
@@ -372,22 +380,39 @@ public class Google {
 		Actions builder = new Actions(driver);
 
 		Action dragandDrop = builder.clickAndHold(item).moveToElement(target).release(item).build();
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 		dragandDrop.perform();
 
+
+
+	}
+	
+	@Test
+	public void selectTest() {
+		
+	
+		WebElement element=driver.findElement(By.id("id_contact"));
+		Select select=new Select(element);
+
+		element.click();
+
+		select.selectByVisibleText("Customer service");
+		
+
+	}
+	
+	@Test
+	public void testViewPort() {
+		
+		WebElement photoCentre=driver.findElement(By.cssSelector("#skip-to-footer div.css-gzci4i.eg5dgjz0>div:nth-child(2)>div:nth-child(5) ul li:nth-child(6) div a"));
+		
+		photoCentre.click();
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	//Method to close the session of driver
