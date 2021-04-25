@@ -1,22 +1,22 @@
 package com.auotmation.SearchBrowser.firstProject;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
@@ -33,6 +33,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 public class Google {
 
 	WebDriver driver;
+	JavascriptExecutor jse;
 
 	@BeforeMethod
 	public void beforeMethod() {
@@ -40,6 +41,7 @@ public class Google {
 		WebDriverManager.chromedriver().setup();
 
 		driver = new ChromeDriver();
+		jse=  (JavascriptExecutor) driver;
 
 		driver.get("https://www.walmart.ca/en");
 		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
@@ -404,21 +406,64 @@ public class Google {
 	@Test
 	public void testViewPort() {
 		
-		WebElement photoCentre=driver.findElement(By.cssSelector("#skip-to-footer div.css-gzci4i.eg5dgjz0>div:nth-child(2)>div:nth-child(5) ul li:nth-child(6) div a"));
-		
+		waitForDocumentCompleteState(15);
+
+		driver.findElement(By.id("accept-privacy-policies")).click();
+
+		WebElement photoCentre = driver.findElement(By.cssSelector(
+				"#skip-to-footer div.css-gzci4i.eg5dgjz0>div:nth-child(2)>div:nth-child(6) ul li:nth-child(6) div a"));
+		jse.executeScript("arguments[0].scrollIntoView(true);", photoCentre);
+
 		photoCentre.click();
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+	}
+	
+	public void pageLoaded() {
+
+		
 	}
 
-	//Method to close the session of driver
+	public void waitForDocumentCompleteState(int secondsToWait) {
+		new WebDriverWait(driver, secondsToWait).until((ExpectedCondition<Boolean>) wd -> {
+
+			while (true) {
+				String readyState = getDocumentReadyState();
+
+				if (readyState.equals("complete")) {
+					System.out.println("Document Ready State is : " + readyState);
+					return true;
+				} else {
+					System.out.println("Document is not in Ready State : " + readyState);
+				}
+
+			}
+		});
+	}
+
+	private String getDocumentReadyState() {
+		try {
+			return jse.executeScript("return document.readyState").toString();
+
+		} catch (WebDriverException e) {
+			return null;
+		}
+
+	}
+
+	void waitForLoad(WebDriver driver) {
+		ExpectedCondition<Boolean> pageLoadCondition = new ExpectedCondition<Boolean>() {
+			public Boolean apply(WebDriver driver) {
+				return ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
+			}
+		};
+		WebDriverWait wait = new WebDriverWait(driver, 30);
+		wait.until(pageLoadCondition);
+	}
+
+	// Method to close the session of driver
 	@AfterMethod
 	public void afterMethod() {
-		driver.quit();
+		// driver.quit();
 
 	}
 
