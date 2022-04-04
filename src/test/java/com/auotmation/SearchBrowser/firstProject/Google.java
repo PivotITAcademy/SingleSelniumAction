@@ -45,7 +45,7 @@ public class Google {
 
 		driver.get("https://www.walmart.ca/en");
 		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		//driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		driver.manage().window().maximize();
 
 	}
@@ -406,7 +406,7 @@ public class Google {
 	@Test
 	public void testViewPort() {
 		
-		waitForDocumentCompleteState(15);
+		waitForDocumentCompleteState(0);
 
 		driver.findElement(By.id("accept-privacy-policies")).click();
 
@@ -424,10 +424,11 @@ public class Google {
 	}
 
 	public void waitForDocumentCompleteState(int secondsToWait) {
-		new WebDriverWait(driver, secondsToWait).until((ExpectedCondition<Boolean>) wd -> {
+		new WebDriverWait(driver, secondsToWait).until((ExpectedCondition<Boolean>) v -> {
 
 			while (true) {
 				String readyState = getDocumentReadyState();
+				System.out.println(readyState);
 
 				if (readyState.equals("complete")) {
 					System.out.println("Document Ready State is : " + readyState);
